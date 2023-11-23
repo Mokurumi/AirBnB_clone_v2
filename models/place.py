@@ -4,20 +4,7 @@ from os import getenv
 from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String, Float, Integer, ForeignKey, Table
 from sqlalchemy.orm import relationship, backref
-
-
-if getenv("HBNB_TYPE_STORAGE") == "db":
-    place_amenity = Table("place_amenity", Base.metadata,
-                          Column("place_id",
-                                 String(60),
-                                 ForeignKey("places.id"),
-                                 primary_key=True,
-                                 nullable=False),
-                          Column("amenity_id",
-                                 String(60),
-                                 ForeignKey("amenities.id"),
-                                 primary_key=True,
-                                 nullable=False))
+from models import storage
 
 
 class Place(BaseModel, Base):
@@ -30,8 +17,8 @@ class Place(BaseModel, Base):
         number_rooms: number of room in int
         number_bathrooms: number of bathrooms in int
         max_guest: maximum guest in int
-        price_by_night:: pice for a staying in int
-        latitude: latitude in flaot
+        price_by_night:: price for a staying in int
+        latitude: latitude in float
         longitude: longitude in float
         amenity_ids: list of Amenity ids
     """
@@ -80,21 +67,16 @@ class Place(BaseModel, Base):
     else:
         @property
         def reviews(self):
-            """Return list of review instances for file storage
-            matching place_id
-            """
-            from models import storage
-            return {k: v for k, v in storage.all().items()
-                    if v.place_id == self.id}
+            """Return list of review instances for file storage matching place_id"""
+            return {k: v for k, v in storage.all().items() if v.place_id == self.id}
 
         @property
         def amenities(self):
             """returns list of amenity ids"""
-            from models import storage
             return self.amenity_ids
 
         @amenities.setter
         def amenities(self, obj):
             """appends amenity id to amenity_ids"""
-            if type(obj) is Amenity and obj.id not in self.amenity_ids:
+            if isinstance(obj, Amenity) and obj.id not in self.amenity_ids:
                 self.amenity_ids.append(obj.id)
