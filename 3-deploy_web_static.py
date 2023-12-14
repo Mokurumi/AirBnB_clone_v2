@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 """
-Fabric script that distributes an archive to web servers
+Fabric script that creates and distributes an archive to web servers
 """
 from fabric.api import env, put, run, local
-from os.path import exists, splitext
+from os.path import exists
 from datetime import datetime
 env.hosts = ['100.27.2.172', '100.25.158.175']
 env.user = 'ubuntu'
@@ -42,3 +42,14 @@ def do_deploy(archive_path):
         run("sudo ln -s {} /data/web_static/current".format(new_version))
         print("New version deployed!")
         return True
+
+
+def deploy():
+    """
+    Deploys archive to web servers
+    """
+    archive_path = do_pack()
+    if not archive_path:
+        return False
+
+    return do_deploy(archive_path)
