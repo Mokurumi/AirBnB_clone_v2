@@ -23,11 +23,13 @@ sudo ln -sf /data/web_static/releases/test/ /data/web_static/current
 # Change ownership of directories to ubuntu user and group
 sudo chown -R ubuntu:ubuntu /data/
 
-# Update Nginx configuration
+# Update Nginx configuration to add missing location block
 nginx_config="/etc/nginx/sites-available/default"
 
-sudo sed -i '/location \/hbnb_static\/ {/a \\talias /data/web_static/current/;' "$nginx_config"
-sudo sed -i '/location \/hbnb_static\/ {/a \\t}' "$nginx_config"
+# Check if location block for /hbnb_static/ already exists, if not, add it
+if ! grep -q "location \/hbnb_static\/ {" "$nginx_config"; then
+    sudo sed -i '/server_name _;/a \\n\tlocation \/hbnb_static\/ {\n\t\talias \/data\/web_static\/current\/;\n\t}\n' "$nginx_config"
+fi
 
 # Restart Nginx
 sudo service nginx restart
