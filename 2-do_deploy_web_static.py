@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-# This a is a fabric script that deploys archive from web_static folder
+"""This a is a fabric script that deploys archive from web_static folder"""
 from fabric import task, Connection
 from os.path import exists
 
@@ -10,15 +10,7 @@ env.key_filename = '~/.ssh/id_rsa'
 
 
 def do_deploy(archive_path):
-    """
-    Distributes an archive to web servers and performs deployment tasks.
-
-    Args:
-        archive_path (str): Path of the archive to be deployed.
-
-    Returns:
-        bool: True if all operations are done correctly, otherwise False.
-    """
+    """Distributes an archive to web servers and performs deployment tasks"""
     if not exists(archive_path):
         print(f"Archive '{archive_path}' doesn't exist.")
         return False
