@@ -3,7 +3,7 @@
 Fabric script that distributes an archive to web servers
 """
 from fabric.api import env, put, run, local
-from os.path import exists, splitext
+from os.path import exists
 from datetime import datetime
 env.hosts = ['100.27.2.172', '100.25.158.175']
 env.user = 'ubuntu'
@@ -28,17 +28,19 @@ def do_deploy(archive_path):
     Distributes an archive to web servers
     """
     if exists(archive_path):
-        archived_file = archive_path.split("/")[-1]
-        filename_no_ext = splitext(archived_file)[0]
-        new_version = "/data/web_static/releases/" + filename_no_ext
-        arc_file_remote = "/tmp/" + archived_file
-        put(archive_path, "/tmp/")
-        run("sudo mkdir -p {}".format(new_version))
-        run("sudo tar -xzf {} -C {}/".format(arc_file_remote, new_version))
-        run("sudo rm {}".format(arc_file_remote))
-        run("sudo mv {}/web_static/* {}".format(new_version, new_version))
-        run("sudo rm -rf {}/web_static".format(new_version))
-        run("sudo rm -rf /data/web_static/current")
-        run("sudo ln -s {} /data/web_static/current".format(new_version))
+        archived_file = archive_path.split("/")[1]
+        filename_no_ext = archived_file.split(".")[0]
+        arc_file_remote = "/tmp/{}".format(archived_file)
+        new_version = "/data/web_static/releases/{}/".format(filename_no_ext)
+        put(archive_path, arc_file_remote)
+        run("mkdir -p {}".format(new_version))
+        run("tar -xzf {} -C {}".format(arc_file_remote, new_version))
+        run("rm {}".format(arc_file_remote))
+        run("mv -f {}web_static/* {}".format(new_version, new_version))
+        run("rm -rf {}web_static".format(new_version))
+        run("rm -rf /data/web_static/current")
+        run("ln -s {} /data/web_static/current".format(new_version))
         print("New version deployed!")
         return True
+    else:
+        return False
