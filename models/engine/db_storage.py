@@ -50,8 +50,8 @@ class DBStorage:
                     for obj in self.__session.query(cls).all()]
         else:
             # Use isinstance for checking the type
-            objs = self.__session.query(cls)
-            if isinstance(cls, type) else self.__session.query(eval(cls))
+            objs = self.__session.query(cls) if isinstance(
+                cls, type) else self.__session.query(eval(cls))
         return {f"{type(o).__name__}.{o.id}": o for o in objs}
 
     def new(self, obj):
