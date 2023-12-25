@@ -27,20 +27,20 @@ def do_deploy(archive_path):
     """
     Distributes an archive to web servers
     """
-    if exists(archive_path):
-        archived_file = archive_path.split("/")[1]
-        filename_no_ext = archived_file.split(".")[0]
-        arc_file_remote = "/tmp/{}".format(archived_file)
-        new_version = "/data/web_static/releases/{}/".format(filename_no_ext)
-        put(archive_path, arc_file_remote)
-        run("mkdir -p {}".format(new_version))
-        run("tar -xzf {} -C {}".format(arc_file_remote, new_version))
-        run("rm {}".format(arc_file_remote))
-        run("mv -f {}web_static/* {}".format(new_version, new_version))
-        run("rm -rf {}web_static".format(new_version))
+    if not exists(archive_path):
+        return False
+    try:
+        file_name = archive_path.split("/")[-1]
+        no_ext = file_name.split(".")[0]
+        path_no_ext = "/data/web_static/releases/{}/".format(no_ext)
+        put(archive_path, "/tmp/")
+        run("mkdir -p {}".format(path_no_ext))
+        run("tar -xzf /tmp/{} -C {}".format(file_name, path_no_ext))
+        run("rm /tmp/{}".format(file_name))
+        run("mv {}web_static/* {}".format(path_no_ext, path_no_ext))
+        run("rm -rf {}web_static".format(path_no_ext))
         run("rm -rf /data/web_static/current")
-        run("ln -s {} /data/web_static/current".format(new_version))
-        print("New version deployed!")
+        run("ln -s {} /data/web_static/current".format(path_no_ext))
         return True
-    else:
+    except Exception as e:
         return False
