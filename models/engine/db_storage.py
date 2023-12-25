@@ -26,10 +26,10 @@ class DBStorage:
     def __init__(self):
         """Initialize a new DBStorage instance."""
         # Use f-strings for better readability
-        self.__engine = create_engine(f"mysql+mysqldb://{getenv(
-            'HBNB_MYSQL_USER')}:{getenv('HBNB_MYSQL_PWD')}@{getenv(
-                'HBNB_MYSQL_HOST')}/{getenv('HBNB_MYSQL_DB')}",
-                pool_pre_ping=True)
+        self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'.format(
+            getenv('HBNB_MYSQL_USER'), getenv('HBNB_MYSQL_PWD'),
+            getenv('HBNB_MYSQL_HOST'), getenv('HBNB_MYSQL_DB')),
+            pool_pre_ping=True)
         if getenv("HBNB_ENV") == "test":
             # Use declarative_base instead of Base.metadata.drop_all
             # for better code organization
