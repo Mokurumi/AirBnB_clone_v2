@@ -7,11 +7,12 @@ from models import storage
 app = Flask(__name__)
 
 
-@app.route('/states_list', strict_slashes=False)
-def states_list():
+@app.route('/hbnb_filters', strict_slashes=False)
+def hbnb_filters():
     """Displays an HTML page with a list of all State objects in DBStorage"""
     states = sorted(list(storage.all("State").values()), key=lambda x: x.name)
-    return render_template('7-states_list.html', states=states)
+    amenities = sorted(list(storage.all("Amenity").values()), key=lambda x: x.name)
+    return render_template('10-hbnb_filters.html', states=states, amenities=amenities)
 
 
 @app.teardown_appcontext
