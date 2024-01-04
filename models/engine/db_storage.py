@@ -1,10 +1,9 @@
 #!/usr/bin/python3
 """Defines the DBStorage engine."""
 from os import getenv
-from models.base_model import Base
 from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session
-from sqlalchemy.orm.session import sessionmaker
+from sqlalchemy.orm import scoped_session, sessionmaker
+from models.base_model import Base
 from models.amenity import Amenity
 from models.city import City
 from models.place import Place
@@ -80,8 +79,8 @@ class DBStorage:
             cls_name = all_classes[type(obj).__name__]
 
             # query class table and delete
-            self.__session.query(cls_name).\
-                filter(cls_name.id == obj.id).delete()
+            query = self.__session.query(cls_name)
+            query = query.filter(cls_name.id == obj.id).delete()
 
     def reload(self):
         """Create all tables in the database and initialize a new session."""
