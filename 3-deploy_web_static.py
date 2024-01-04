@@ -24,7 +24,8 @@ def do_pack():
         return file_name
     except:
         return None
-    
+
+
 def do_deploy(archive_path):
     """
     Distributes an archive to your web servers, using the function do_deploy
@@ -48,7 +49,8 @@ def do_deploy(archive_path):
         return True
     except:
         return False
-    
+
+
 def deploy():
     """
     Creates and distributes an archive to your web servers
