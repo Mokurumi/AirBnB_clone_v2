@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 """This is the console for AirBnB"""
 import cmd
-import re
 from models import storage
 from datetime import datetime
 from models.base_model import BaseModel
@@ -18,8 +17,9 @@ class HBNBCommand(cmd.Cmd):
     """this class is entry point of the command interpreter
     """
     prompt = "(hbnb) "
-    all_classes = {"BaseModel", "User", "State", "City",
-                   "Amenity", "Place", "Review"}
+    all_classes = {"BaseModel": BaseModel, "User": User, "State": State,
+                   "City": City, "Amenity": Amenity, "Place": Place,
+                   "Review": Review}
 
     def emptyline(self):
         """Ignores empty spaces"""
@@ -43,35 +43,32 @@ class HBNBCommand(cmd.Cmd):
             if not line:
                 raise SyntaxError()
             my_list = line.split(" ")
-            obj = eval("{}()".format(my_list[0]))
+
+            if my_list:
+                cls_name = my_list[0]
+            else:
+                raise SyntaxError()
+
+            kwargs = {}
+
             for pair in my_list[1:]:
-                pair = pair.split('=', 1)
-                if len(pair) == 1 or "" in pair:
-                    continue
-                match = re.search('^"(.*)"$', pair[1])
-                cast = str
-                if match:
-                    value = match.group(1)
-                    value = value.replace('_', ' ')
-                    value = re.sub(r'(?<!\\)"', r'\\"', value)
+                k, v = pair.split("=")
+                if self.is_int(v):
+                    kwargs[k] = int(v)
+                elif self.is_float(v):
+                    kwargs[k] = float(v)
                 else:
-                    value = pair[1]
-                    if "." in value:
-                        cast = float
-                    else:
-                        cast = int
-                try:
-                    value = cast(value)
-                except ValueError:
-                    pass
-                # TODO: escape double quotes for string
-                # TODO: replace '_' with spaces ' ' for string
-                setattr(obj, pair[0], value)
+                    v = v.replace('_', ' ')
+                    kwargs[k] = v.strip('"\'')
+
+            obj = self.all_classes[cls_name](**kwargs)
+            storage.new(obj)
             obj.save()
-            print("{}".format(obj.id))
+            print(obj.id)
+
         except SyntaxError:
             print("** class name missing **")
-        except NameError:
+        except KeyError:
             print("** class doesn't exist **")
 
     def do_show(self, line):
@@ -125,6 +122,7 @@ class HBNBCommand(cmd.Cmd):
             key = my_list[0] + '.' + my_list[1]
             if key in objects:
                 storage.delete(objects[key])
+                storage.save()
             else:
                 raise KeyError()
         except SyntaxError:
@@ -265,12 +263,28 @@ class HBNBCommand(cmd.Cmd):
                     obj = storage.all()
                     key = args[0] + ' ' + args[1]
                     for k, v in args[2].items():
-                        self.do_update(f'{key} "{k}" "{v}"')
+                        self.do_update(key + ' "{}" "{}"'.format(k, v))
                 else:
                     self.do_update(args)
         else:
             cmd.Cmd.default(self, line)
 
+    @staticmethod
+    def is_int(n):
+        """ checks if integer"""
+        try:
+            int(n)
+            return True
+        except ValueError:
+            return False
+
+    @staticmethod
+    def is_float(n):
+        try:
+            float(n)
+            return True
+        except ValueError:
+            return False
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
