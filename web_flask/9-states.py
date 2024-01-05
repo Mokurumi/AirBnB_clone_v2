@@ -9,22 +9,12 @@ from models.city import City
 app = Flask(__name__)
 
 
-@app.route("/states", strict_slashes=False)
-def states():
-    """
-    Displays an HTML page with a list of all States.
-    """
-    states = storage.all("State")
-    return render_template("9-states.html", state=states)
-
-
-@app.route("/states/<id>", strict_slashes=False)
-def states_id(id):
-    """Displays an HTML page with about <id>, if it exists."""
-    for state in storage.all(State).values():
-        if state.id == id:
-            return render_template("9-states.html", state=state)
-    return render_template("9-states.html")
+@app.route('/states', strict_slashes=False)
+@app.route('/states/<id>', strict_slashes=False)
+def states(id=None):
+    """Displays an HTML page with a list of all State objects in DBStorage"""
+    states = sorted(list(storage.all(State).values()), key=lambda x: x.name)
+    return render_template('9-states.html', states=states, id=id)
 
 
 @app.teardown_appcontext
