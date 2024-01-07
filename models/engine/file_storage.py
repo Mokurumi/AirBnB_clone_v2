@@ -30,7 +30,10 @@ class FileStorage:
         if cls is not None:
             if isinstance(cls, str):
                 cls = eval(cls)
-            cls_dict = {k: v for k, v in self.__objects.items() if isinstance(v, cls)}
+            cls_dict = {}
+            for k, v in self.__objects.items():
+                if isinstance(v, cls):
+                    cls_dict[k] = v
             return cls_dict
         return self.__objects
 
