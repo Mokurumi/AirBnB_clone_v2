@@ -24,6 +24,10 @@
     {% endif %}
     {% endfor %}
     {% endif %}
+    <!-- if there is no state with this id, display Not found -->
+    {% if id not in states|map(attribute='id') %}
+    <H1>Not found!</H1>
+    {% endif %}
 </BODY>
 
 </HTML>
